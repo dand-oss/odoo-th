@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 LABEL maintainer="Poonlap V. <poonlap@tanabutr.co.th>"
 
 # Generate locale, set timezone
-RUN apt update \
+RUN apt-get update \
 	&& apt -yq install locales tzdata\
 	&& sed -i 's/# th_/th_/' /etc/locale.gen \
 	&& locale-gen \
@@ -10,14 +10,14 @@ RUN apt update \
 
 
 # install Laksaman font (Sarabun)
-RUN apt -yq install fonts-tlwg-laksaman
+RUN apt-get -yq install fonts-tlwg-laksaman
 
 # install postgres
-RUN apt install postgresql -y
+RUN apt-get install postgresql -y
 
 
 # Install some deps, lessc and less-plugin-clean-css
-RUN apt install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
             ca-certificates \
             curl \ 
             dirmngr \
@@ -37,7 +37,7 @@ RUN apt install -y --no-install-recommends \
             git
 
 # install wkhtmltopdf
-RUN apt install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
 	libjpeg62 \
 	libx11-6 \
 	libxext6 \
@@ -52,7 +52,7 @@ RUN apt install -y --no-install-recommends \
 
 # Repository
 RUN curl https://nightly.odoo.com/odoo.key | apt-key add - \
-	&& echo "deb http://nightly.odoo.com/13.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
+	&& echo "deb https://nightly.odoo.com/master/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
 
 # Install odoo
 RUN apt update \
@@ -63,11 +63,12 @@ RUN pip3 install num2words xlwt
 RUN mkdir -p /opt/odoo/addons \ 
 	&& cd /opt/odoo/addons \
 	&& git clone https://github.com/OCA/l10n-thailand.git \
-        && git clone --single-branch --branch 13.0 https://github.com/OCA/web.git
+        && git clone --single-branch --branch 13.0 https://github.com/OCA/web.git \
+        && git clone --single-branch --branch 13.0 https://github.com/OCA/partner-contact.git \
+	&& git clone --single-branch --branch 13.0 https://github.com/OCA/server-ux.git \
+	&& git clone --single-branch --branch 13.0 https://github.com/OCA/reporting-engine.git \
+	&& git clone https://github.com/poonlap/geonames_th.git
 
-# delete this when l10n-thailand is updated to v.13
-# at this moment l10n_th_partner is OK for 13.0
-RUN sed -i s/12.0/13.0/ /opt/odoo/addons/l10n-thailand/l10n_th_partner/__manifest__.py
 
 #RUN pip3 install odoo13-addon-web-responsive
 
